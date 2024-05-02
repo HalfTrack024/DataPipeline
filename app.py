@@ -1,11 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from modules import opcua_mod as opcua
+from modules import ads_mod as ads
 
 class OPCUA_SUB(BaseModel):
     endpoint: str | None = None
     nodes: list | None = None
 
+class ADS_SUB(BaseModel):
+    endpoint: str | None = None
+    tag_name: str | None = None
+    plc_datatype: str | None = None
 
 app = FastAPI()
 
@@ -28,6 +33,15 @@ async def remove_subscribers(opc: OPCUA_SUB):
     node_ids = opc.nodes
     await opcua.opcua_remove_subscribers(node_ids)
     return {"message": "Removed Nodes "}
+
+@app.post("/ads/subscribe/")
+async def ads_subscribe(ads_sub: ADS_SUB):
+    try:
+        handle = ads.add_subscriber(ads_sub.tag_name, ads_sub.plc_datatype)
+        return {"message" : "Subscription Added: ", "handle" : handle}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Run the FastAPI app
 if __name__ == "__main__":
