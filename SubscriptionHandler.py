@@ -1,6 +1,7 @@
 from asyncua import Client, Node
 import asyncio
 import paho.mqtt.publish as publish
+
 class SubscriptionHandler:
     async def datachange_notification(self, node: Node, val, data):
         MQTT_HOST = "localhost"
@@ -13,3 +14,7 @@ class SubscriptionHandler:
 
 
         print(f"Data change at node {node}: {val}")
+
+class ADSSubscriptionHandler:
+    async def call_back(notification, data):
+        print(f"Notification for {notification}: {data}")
